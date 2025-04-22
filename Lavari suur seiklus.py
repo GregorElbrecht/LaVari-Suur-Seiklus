@@ -23,7 +23,7 @@ pygame.key.set_repeat(1,6)
 
 # LaVar
 posX, posY = 120, 320
-lavar = pygame.Rect(posX, posY, 70, 170)
+lavar = pygame.Rect(posX, posY, 70, 120)
 playerImage = pygame.image.load("LaVar.png")
 playerImage = pygame.transform.scale(playerImage, [lavar.width, lavar.height])
 
