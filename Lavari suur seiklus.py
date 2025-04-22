@@ -13,6 +13,12 @@ screen = pygame.display.set_mode([ekraanX, ekraanY])
 pygame.display.set_caption("LaVarri suur seiklus")
 clock = pygame.time.Clock()
 
+#muusika
+pygame.mixer.init()
+muusika = pygame.mixer.Sound("")
+muusika.set_volume(0.6)
+muusika.play()
+
 # Laadi taustapilt
 bg_image = pygame.image.load("cbj-hornetsfloor5_1200xx5184-2916-0-270.jpg")
 
