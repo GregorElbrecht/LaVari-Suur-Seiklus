@@ -15,7 +15,7 @@ clock = pygame.time.Clock()
 
 #muusika
 pygame.mixer.init()
-muusika = pygame.mixer.Sound("")
+muusika = pygame.mixer.Sound("G3 (LiAngelo Ball) - Tweaker (Official Audio) (1).mp3")
 muusika.set_volume(0.6)
 muusika.play()
 
@@ -78,6 +78,8 @@ while not gameover:
     if randint(1, 50) == 1:  # Väike tõenäosus uue palli tekkeks
         enemy_rect = pygame.Rect(ekraanX, randint(50, ekraanY - 70), 60, 73)
         enemies.append(enemy_rect)
+        boing =  pygame.mixer.Sound("Basketball Bounce - Sound Effect.mp3")
+        boing.play()
 
     # Pallide liikumine
     for enemy in enemies:
@@ -99,7 +101,7 @@ while not gameover:
                 posY += -4
             elif event.key == K_DOWN:
                 posY += 4
-            posY = pygame.math.clamp(posY, 0, 505)
+            posY = pygame.math.clamp(posY, 0, 555)
         elif event.type == KEYUP:
             if event.key == K_UP or event.key == K_DOWN:
                 speedY = 0
@@ -121,5 +123,5 @@ screen.blit(gameover_text, (ekraanX // 2 - 150, ekraanY // 2 - 50))
 screen.blit(time_text, (ekraanX // 2 - 150, ekraanY // 2 + 20))
 pygame.display.flip()
 
-pygame.time.delay(3000)  # Näita ekraani 3 sekundit
+pygame.time.delay(2000)  # Näita ekraani 3 sekundit
 pygame.quit()
