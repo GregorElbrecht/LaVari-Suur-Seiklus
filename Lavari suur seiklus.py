@@ -75,7 +75,7 @@ while not gameover:
     screen.blit(time_text, (400, 10))
 
     # Pallide genereerimine
-    if randint(1, 50) == 1:  # Väike tõenäosus uue palli tekkeks
+    if randint(1, 21) == 1:  # Väike tõenäosus uue palli tekkeks
         enemy_rect = pygame.Rect(ekraanX, randint(50, ekraanY - 70), 60, 73)
         enemies.append(enemy_rect)
         boing =  pygame.mixer.Sound("Basketball Bounce - Sound Effect.mp3")
@@ -83,7 +83,7 @@ while not gameover:
 
     # Pallide liikumine
     for enemy in enemies:
-        enemy.x -= 5  # Liiguvad vasakule
+        enemy.x -= 20  # Liiguvad vasakule
         screen.blit(pygame.transform.scale(pallImage, (enemy.width, enemy.height)), enemy)
 
         # Kontrolli, kas pall tabab LaVarit
@@ -98,9 +98,9 @@ while not gameover:
             gameover = True
         elif event.type == KEYDOWN:
             if event.key == K_UP:
-                posY += -4
+                posY += -5
             elif event.key == K_DOWN:
-                posY += 4
+                posY += 5
             posY = pygame.math.clamp(posY, 0, 555)
         elif event.type == KEYUP:
             if event.key == K_UP or event.key == K_DOWN:
@@ -119,9 +119,11 @@ while not gameover:
 screen.fill((0, 0, 0))
 gameover_text = font.render("GAME OVER", True, white)
 time_text = font.render(f"Ellu jaid: {round(elapsed_time, 1)}s", True, white)
+info_text = font.render(f"Rakendus sulgeb automaatselt",True, white)
 screen.blit(gameover_text, (ekraanX // 2 - 150, ekraanY // 2 - 50))
 screen.blit(time_text, (ekraanX // 2 - 150, ekraanY // 2 + 20))
+screen.blit(info_text, (ekraanX // 2 - 150, ekraanY // 2 + 90))
 pygame.display.flip()
 
-pygame.time.delay(2000)  # Näita ekraani 3 sekundit
+pygame.time.delay(2000)  # Näita ekraani 2 sekundit
 pygame.quit()
