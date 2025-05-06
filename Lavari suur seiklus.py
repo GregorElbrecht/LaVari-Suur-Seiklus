@@ -83,13 +83,13 @@ while not gameover:
 
     # Pallide liikumine
     for enemy in enemies:
-        enemy.x -= 20  # Liiguvad vasakule
+        enemy.x -= 16  # Liiguvad vasakule
         screen.blit(pygame.transform.scale(pallImage, (enemy.width, enemy.height)), enemy)
 
         # Kontrolli, kas pall tabab LaVarit
         if lavar.colliderect(enemy):
             gameover = True
-            pygame.time.delay(1000)
+            pygame.time.delay(500)
 
 
     # Mängija juhtimine (liikumine nooleklahvidega)
