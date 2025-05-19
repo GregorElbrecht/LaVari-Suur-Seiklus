@@ -89,9 +89,9 @@ while not gameover:
     # Aeg ja skoor
     elapsed_time = (pygame.time.get_ticks() - start_time) / 1000
     time_text = font.render(f"Timer: {round(elapsed_time, 1)}s", True, white)
-    screen.blit(time_text, (400, 10))
+    screen.blit(time_text, (500, 10))
     score_text = font.render(f"Punktid: {score}", True, white)
-    screen.blit(score_text, (50, 10))
+    screen.blit(score_text, (200, 10))
 
     # Kiiruse suurendamine iga 10 punkti järel
     if score >= viimane_kiirendus + 10:
