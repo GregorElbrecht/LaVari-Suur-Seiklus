@@ -14,19 +14,27 @@ pygame.display.set_caption("LaVarri suur seiklus")
 pygame.display.set_icon(pygame.image.load("LaVar.png"))
 clock = pygame.time.Clock()
 
-#muusika
+# Mute/unmute pildid ja algne olek
+mute_icon = pygame.image.load("mute.png")
+unmute_icon = pygame.image.load("unmute.png")
+mute_icon = pygame.transform.scale(mute_icon, (40, 40))
+unmute_icon = pygame.transform.scale(unmute_icon, (40, 40))
+heli_sees = True
+mute_rect = pygame.Rect(ekraanX - 50, 10, 40, 40)
+
+# Muusika
 pygame.mixer.init()
 muusika = pygame.mixer.Sound("G3 (LiAngelo Ball) - Tweaker (Official Audio) (1).mp3")
 muusika.set_volume(0.6)
 muusika.play()
 
-# Laadi taustapilt
+# Taustapilt
 bg_image = pygame.image.load("cbj-hornetsfloor5_1200xx5184-2916-0-270.jpg")
 
 # Font
 font = pygame.font.Font("Fortnite.ttf", 50)
 
-pygame.key.set_repeat(1,6)
+pygame.key.set_repeat(1, 6)
 
 # LaVar
 posX, posY = 120, 320
@@ -38,17 +46,16 @@ playerImage = pygame.transform.scale(playerImage, [lavar.width, lavar.height])
 enemies = []
 pallImage = pygame.image.load("Basketball.png")
 
-# Taimeri algus
-start_time = pygame.time.get_ticks()
-
-gameover = False
-
+# Punktid ja pallide kiirus
+score = 0
+palli_kiirus = 10
+viimane_kiirendus = 0
 
 # Start Screen
 def start_screen():
     screen.fill((0, 0, 0))
     info = pygame.image.load("keys.png")
-    screen.blit(info, (780,250))
+    screen.blit(info, (780, 250))
     start_text = font.render("VAJUTA SPACE, ET ALUSTADA", True, white)
     screen.blit(start_text, (ekraanX // 2 - 350, ekraanY // 2 - 50))
     pygame.display.flip()
@@ -62,6 +69,12 @@ def start_screen():
             if event.type == KEYDOWN and event.key == K_SPACE:
                 waiting = False
 
+# Heli mute/unmute
+def toggle_mute():
+    global heli_sees
+    heli_sees = not heli_sees
+    volume = 0.6 if heli_sees else 0
+    muusika.set_volume(volume)
 
 # Käivitame stardiekraani
 start_screen()
@@ -69,66 +82,89 @@ start_screen()
 # Taimeri algus
 start_time = pygame.time.get_ticks()
 gameover = False
-while not gameover:
-    screen.blit(bg_image, (0, 0))  # Tausta uuesti joonistamine
 
-    # Mänguaeg ekraanile
-    elapsed_time = (pygame.time.get_ticks() - start_time) / 1000  # Sekundites
+while not gameover:
+    screen.blit(bg_image, (0, 0))  # Taust
+
+    # Aeg ja skoor
+    elapsed_time = (pygame.time.get_ticks() - start_time) / 1000
     time_text = font.render(f"Timer: {round(elapsed_time, 1)}s", True, white)
     screen.blit(time_text, (400, 10))
+    score_text = font.render(f"Punktid: {score}", True, white)
+    screen.blit(score_text, (50, 10))
 
-    # Pallide genereerimine
-    if randint(1, 30) == 1:  # Väike tõenäosus uue palli tekkeks
+    # Kiiruse suurendamine iga 10 punkti järel
+    if score >= viimane_kiirendus + 10:
+        palli_kiirus += 2
+        viimane_kiirendus = score
+
+    # Korvpallide genereerimine
+    if randint(1, 30) == 1:
         enemy_rect = pygame.Rect(ekraanX, randint(50, ekraanY - 70), 60, 73)
         enemies.append(enemy_rect)
-        boing =  pygame.mixer.Sound("Basketball Bounce - Sound Effect.mp3")
+        boing = pygame.mixer.Sound("Basketball Bounce - Sound Effect.mp3")
+        boing.set_volume(0.6 if heli_sees else 0)
         boing.play()
 
-    # Pallide liikumine
-    for enemy in enemies:
-        enemy.x -= 16  # Liiguvad vasakule
-        screen.blit(pygame.transform.scale(pallImage, (enemy.width, enemy.height)), enemy)
+    # Korvpallide liikumine
+    for enemy in enemies[:]:
+        enemy.x -= palli_kiirus
 
-        # Kontrolli, kas pall tabab LaVarit
         if lavar.colliderect(enemy):
             gameover = True
             boo = pygame.mixer.Sound("Crowd Booing with a Boo You Suck! at the End  Funny.mp3")
+            boo.set_volume(0.6 if heli_sees else 0)
             boo.play()
             pygame.time.delay(1000)
+        elif enemy.x + enemy.width < 0:
+            enemies.remove(enemy)
+            score += 1
+        else:
+            screen.blit(pygame.transform.scale(pallImage, (enemy.width, enemy.height)), enemy)
 
-
-    # Mängija juhtimine (liikumine nooleklahvidega)
+    # Mängija liikumine
     for event in pygame.event.get():
         if event.type == QUIT:
             gameover = True
         elif event.type == KEYDOWN:
             if event.key == K_UP:
-                posY += -5
+                posY -= 5
             elif event.key == K_DOWN:
                 posY += 5
             posY = pygame.math.clamp(posY, 0, 555)
         elif event.type == KEYUP:
             if event.key == K_UP or event.key == K_DOWN:
                 speedY = 0
+        elif event.type == MOUSEBUTTONDOWN:
+            if mute_rect.collidepoint(event.pos):
+                toggle_mute()
 
-    # Piira liikumine ekraani sees
+    # LaVar liikumise piiramine
     posY = max(0, min(ekraanY - lavar.height, posY))
-    lavar.y = posY  # Uuenda LaVari positsiooni
+    lavar.y = posY
     screen.blit(playerImage, lavar)
+
+    # Mute/unmute ikoon
+    if heli_sees:
+        screen.blit(unmute_icon, mute_rect)
+    else:
+        screen.blit(mute_icon, mute_rect)
 
     pygame.display.flip()
     clock.tick(60)
 
-
-# "Game Over" ekraan
+# Game Over
 screen.fill((0, 0, 0))
 gameover_text = font.render("GAME OVER", True, white)
 time_text = font.render(f"Ellu jaid: {round(elapsed_time, 1)}s", True, white)
-info_text = font.render(f"Rakendus sulgeb automaatselt",True, white)
+score_text = font.render(f"Punkte kogusid: {score}", True, white)
+info_text = font.render(f"Rakendus sulgeb automaatselt", True, white)
+
 screen.blit(gameover_text, (ekraanX // 2 - 150, ekraanY // 2 - 50))
 screen.blit(time_text, (ekraanX // 2 - 150, ekraanY // 2 + 20))
+screen.blit(score_text, (ekraanX // 2 - 150, ekraanY // 2 + 60))
 screen.blit(info_text, (ekraanX // 2 - 150, ekraanY // 2 + 90))
 pygame.display.flip()
 
-pygame.time.delay(3000)  # Näita ekraani 3 sekundit
+pygame.time.delay(3000)
 pygame.quit()
