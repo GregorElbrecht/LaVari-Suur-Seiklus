@@ -48,8 +48,17 @@ pallImage = pygame.image.load("Basketball.png")
 
 # Punktid ja pallide kiirus
 score = 0
-palli_kiirus = 10
+pallide_arv = 31
+palli_kiirus = 7
 viimane_kiirendus = 0
+
+#Helieffektid
+speedup = pygame.mixer.Sound("Sonic Spin Dash - Sound Effect.mp3")
+speedup.set_volume(0.1  if heli_sees else 0)
+boing = pygame.mixer.Sound("Basketball Bounce - Sound Effect.mp3")
+boing.set_volume(0.4 if heli_sees else 0)
+boo = pygame.mixer.Sound("Crowd Booing with a Boo You Suck! at the End  Funny.mp3")
+boo.set_volume(0.3 if heli_sees else 0)
 
 # Start Screen
 def start_screen():
@@ -75,6 +84,9 @@ def toggle_mute():
     heli_sees = not heli_sees
     volume = 0.6 if heli_sees else 0
     muusika.set_volume(volume)
+    boing.set_volume(volume)
+    speedup.set_volume(volume)
+    boo.set_volume(volume)
 
 # Käivitame stardiekraani
 start_screen()
@@ -96,14 +108,16 @@ while not gameover:
     # Kiiruse suurendamine iga 10 punkti järel
     if score >= viimane_kiirendus + 10:
         palli_kiirus += 2
+        pallide_arv -= 1
         viimane_kiirendus = score
+        speedup.play()
+        kiirus_text = font.render(f"Speed up!", True, white)
+        screen.blit(kiirus_text, (0,300))
 
     # Korvpallide genereerimine
-    if randint(1, 30) == 1:
+    if randint(1, pallide_arv) == 1:
         enemy_rect = pygame.Rect(ekraanX, randint(50, ekraanY - 70), 60, 73)
         enemies.append(enemy_rect)
-        boing = pygame.mixer.Sound("Basketball Bounce - Sound Effect.mp3")
-        boing.set_volume(0.6 if heli_sees else 0)
         boing.play()
 
     # Korvpallide liikumine
@@ -112,8 +126,7 @@ while not gameover:
 
         if lavar.colliderect(enemy):
             gameover = True
-            boo = pygame.mixer.Sound("Crowd Booing with a Boo You Suck! at the End  Funny.mp3")
-            boo.set_volume(0.6 if heli_sees else 0)
+
             boo.play()
             pygame.time.delay(1000)
         elif enemy.x + enemy.width < 0:
@@ -162,8 +175,8 @@ info_text = font.render(f"Rakendus sulgeb automaatselt", True, white)
 
 screen.blit(gameover_text, (ekraanX // 2 - 150, ekraanY // 2 - 50))
 screen.blit(time_text, (ekraanX // 2 - 150, ekraanY // 2 + 20))
-screen.blit(score_text, (ekraanX // 2 - 150, ekraanY // 2 + 60))
-screen.blit(info_text, (ekraanX // 2 - 150, ekraanY // 2 + 90))
+screen.blit(score_text, (ekraanX // 2 - 150, ekraanY // 2 + 70))
+screen.blit(info_text, (ekraanX // 2 - 150, ekraanY // 2 + 120))
 pygame.display.flip()
 
 pygame.time.delay(3000)
