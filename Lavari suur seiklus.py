@@ -10,7 +10,7 @@ black = (0, 0, 0)
 
 # Ekraani suurus
 ekraanX, ekraanY = 1200, 675
-screen = pygame.display.set_mode([ekraanX, ekraanY])
+ekraan = pygame.display.set_mode([ekraanX, ekraanY])
 pygame.display.set_caption("LaVarri suur seiklus")
 pygame.display.set_icon(pygame.image.load("LaVar.png"))
 clock = pygame.time.Clock()
@@ -50,11 +50,14 @@ boo = pygame.mixer.Sound("Crowd Booing with a Boo You Suck! at the End  Funny.mp
 
 # Stardiekraan
 def start_screen():
-    screen.fill(black)
-    info = pygame.image.load("keys.png")
-    screen.blit(info, (780, 250))
+    taust = pygame.image.load("start.jpg")
+    taust = pygame.transform.scale(taust, (ekraanX, ekraanY))
+    ekraan.blit(taust, (0, 0))
+
+    info_text = font.render("Juhi LaVari nooleklahvidega",True,white)
+    ekraan.blit(info_text, ((ekraanX / 2 , ekraanY / 2 + 50 )))
     start_text = font.render("VAJUTA SPACE, ET ALUSTADA", True, white)
-    screen.blit(start_text, (ekraanX // 2 - 350, ekraanY // 2 - 50))
+    ekraan.blit(start_text, (ekraanX / 2 , ekraanY / 2 ))
     pygame.display.flip()
 
     waiting = True
@@ -96,13 +99,13 @@ def run_game():
     gameover = False
 
     while not gameover:
-        screen.blit(bg_image, (0, 0))
+        ekraan.blit(bg_image, (0, 0))
 
         elapsed_time = (pygame.time.get_ticks() - start_time) / 1000
         time_text = font.render(f"Timer: {round(elapsed_time, 1)}s", True, white)
         score_text = font.render(f"Punktid: {score}", True, white)
-        screen.blit(time_text, (500, 10))
-        screen.blit(score_text, (200, 10))
+        ekraan.blit(time_text, (500, 10))
+        ekraan.blit(score_text, (200, 10))
 
         # Speedup tekst ja efekt
         if score >= viimane_kiirendus + 10:
@@ -115,7 +118,7 @@ def run_game():
 
         if pygame.time.get_ticks() - speedup_text_timer < 1000:
             kiirus_text = font.render("Speed up!", True, white)
-            screen.blit(kiirus_text, (0, speedup_text_y))
+            ekraan.blit(kiirus_text, (0, speedup_text_y))
             speedup_text_y -= 2  # Tekst liigub üles
 
         # Uus korvpall
@@ -135,7 +138,7 @@ def run_game():
                 enemies.remove(enemy)
                 score += 1
             else:
-                screen.blit(pygame.transform.scale(pallImage, (enemy.width, enemy.height)), enemy)
+                ekraan.blit(pygame.transform.scale(pallImage, (enemy.width, enemy.height)), enemy)
 
         # Mängija juhtimine
         for event in pygame.event.get():
@@ -153,29 +156,29 @@ def run_game():
                     toggle_mute()
 
         lavar.y = max(0, min(ekraanY - lavar.height, posY))
-        screen.blit(player_scaled, lavar)
+        ekraan.blit(player_scaled, lavar)
 
         # Mute ikoon
-        screen.blit(unmute_icon if heli_sees else mute_icon, mute_rect)
+        ekraan.blit(unmute_icon if heli_sees else mute_icon, mute_rect)
 
         pygame.display.flip()
         clock.tick(60)
 
     # Game Over ekraan + Uuesti
     while True:
-        screen.fill((0, 0, 0))
+        ekraan.fill((0, 0, 0))
         gameover_text = font.render("GAME OVER", True, white)
         time_text = font.render(f"Pidasid vastu: {round(elapsed_time, 1)}s", True, white)
         score_text = font.render(f"Punkte kogusid: {score}", True, white)
         restart_text = font.render("UUESTI", True, black)
 
         restart_button = pygame.Rect(ekraanX // 2 - 100, ekraanY // 2 + 130, 200, 60)
-        pygame.draw.rect(screen, white, restart_button)
-        screen.blit(restart_text, (restart_button.x + 35, restart_button.y + 10))
+        pygame.draw.rect(ekraan, white, restart_button)
+        ekraan.blit(restart_text, (restart_button.x + 35, restart_button.y + 10))
 
-        screen.blit(gameover_text, (ekraanX // 2 - 150, ekraanY // 2 - 50))
-        screen.blit(time_text, (ekraanX // 2 - 150, ekraanY // 2 + 20))
-        screen.blit(score_text, (ekraanX // 2 - 150, ekraanY // 2 + 70))
+        ekraan.blit(gameover_text, (ekraanX // 2 - 150, ekraanY // 2 - 50))
+        ekraan.blit(time_text, (ekraanX // 2 - 150, ekraanY // 2 + 20))
+        ekraan.blit(score_text, (ekraanX // 2 - 150, ekraanY // 2 + 70))
 
         pygame.display.flip()
 
